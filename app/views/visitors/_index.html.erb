@@ -1,0 +1,129 @@
+<h3 align="center">
+	<div id="popup" class="modal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+</h3>
+<% if  user_signed_in? %>
+      <div  style="border:1px solid black; background-color: <%= @blog.background_color unless @blog.blank? %>" id = "myId">
+    		<header class="intro-header">
+            <div class="container text-center">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="post-heading">
+                         <h1 style= <%= @blog.style  unless @blog.blank? %> id = "body">
+                              <%= @blog.title rescue "Title" %>
+                            </h1> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <ul class='custom-menu'>
+        <li><%= link_to 'Change Title', new_blog_path, {:remote => true, 'data-controls-modal' =>  "modal-window", 'data-backdrop' => true, 'data-keyboard' => true, 'data-toggle' =>  "modal" }  %></li>
+          <li> Back Ground
+            <select id="bg" onchange="changeElement();">
+              <% Blog::COLOR.each do |x| %>
+                <option style="color: <%= x%>" value= <%= x %>><%= x%></option>
+              <%end%>
+            </select>
+          </li> 
+          <li> Color
+            <select id="color" onchange="changeElement();">
+              <% Blog::COLOR.each do |x| %>
+                <option style="color: <%= x%>" value= <%= x %>><%= x%></option>
+              <%end%>
+            </select>
+          </li> 
+          <li>Font
+            <select id = "font" onchange="changeElement();">
+              <% Blog::FONT.each do |x| %>
+                <option style="font-family: <%= x%>" value= <%= x %>><%= x%></option>
+              <%end%>
+            </select>
+          </li> 
+          <li>Font-size
+          <select id = "size" onchange="changeElement();">
+          <% (10..1000).each do |x| %>
+                <option style="font-size: <%= x%>" value= <%= x %>><%= x%></option>
+              <%end%>
+              </select>
+          </li>
+          <% unless @blog.blank? %>
+            <li>
+            <input type="submit" value="Apply" id = "apply"onclick="select_color(<%= @blog.id%>)" >
+            </li>
+          <% end %>  
+        </ul>
+<% else %>
+	<h1> SignIn Required</h1>
+<% end %>
+	
+<script type="text/javascript">
+  function changeElement() {
+    var el = document.getElementById("myId");
+    el.style.backgroundColor = $('#bg').val();
+    var element = document.getElementById("body");
+    element.style.color =  $('#color').val();
+    element.style.fontSize = $('#size').val();
+    element.style.fontFamily =  $('#font').val();
+  }
+
+  $(document).bind("contextmenu", function (event) {
+    event.preventDefault();
+    $(".custom-menu").finish().toggle(100).
+    css({
+      top: event.pageY + "px",
+      left: event.pageX + "px"
+    });
+  });
+
+  $(document).bind("mousedown", function (e) {
+    if (!$(e.target).parents(".custom-menu").length > 0) {
+      $(".custom-menu").hide(100);
+    }
+  });
+
+  function select_color(id){
+    var color = $('#color').val();
+    var bg = $('#bg').val();
+    var font = $('#font').val();
+    var size =  $('#size').val();
+    var style = 'color:' + color + ';' + 'font-family:' + font + ';' + 'font-size:' + size + 'px;'
+
+    var data = { 'style': style, 'id' : id, 'background' : bg }
+    $.ajax({
+      url : '/blogs/' + id + '/ajax_update',
+      data : data,
+      type : 'GET',
+      contentType : 'application/js',
+      dataType : 'JSON'
+    });
+    $(".custom-menu").hide();
+  }
+</script>
+
+<style type="text/css">
+  .custom-menu {
+    display: none;
+    z-index: 1000;
+    position: absolute;
+    overflow: hidden;
+    border: 1px solid #CCC;
+    white-space: nowrap;
+    font-family: sans-serif;
+    background: #FFF;
+    color: #333;
+    border-radius: 5px;
+    padding: 0;
+}
+
+/* Each of the items in the list */
+.custom-menu li {
+    padding: 8px 12px;
+    cursor: pointer;
+    list-style-type: none;
+    transition: all .3s ease;
+}
+
+.custom-menu li:hover {
+    background-color: #DEF;
+}
+</style>

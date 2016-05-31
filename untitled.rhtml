@@ -1,0 +1,201 @@
+<h3 align="center">
+	<div id="popup" class="modal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+</h3>
+<% if  user_signed_in? %>
+	<li><%= link_to 'create Blog', new_blog_path, {:remote => true, 'data-controls-modal' =>  "modal-window", 'data-backdrop' => true, 'data-keyboard' => true, 'data-toggle' =>  "modal" }  %></li>
+  <li><%= link_to 'create Blog', new_blog_path %></li>
+	<% unless @blog.blank? %>
+    <% @blog.each do |blog| %>
+      <div  style="border:1px solid black;" id = "myId">
+    		<header class="intro-header">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="post-heading">
+                          <!-- <h1 style="color: <%= blog.t_color%>; font-family: <%= blog.t_font %>; font-size:  <%#= blog.t_font.nil? ? 25 : (blog.t_font_size).to_i %>px">
+                          <%= blog.title %></h1> -->
+                          <h1 style= <%= blog.style%> >
+                            <%= blog.title %>
+                          </h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <ul class='custom-menu'>
+        <li> Back Ground
+            <select id="bg" >
+              <% Blog::COLOR.each do |x| %>
+                <option style="color: <%= x%>" value= <%= x %>><%= x%></option>
+              <%end%>
+            </select>
+          </li> 
+          <li> Color
+            <select id="color" >
+              <% Blog::COLOR.each do |x| %>
+                <option style="color: <%= x%>" value= <%= x %>><%= x%></option>
+              <%end%>
+            </select>
+          </li> 
+          <li>Font
+            <select id = "font">
+              <% Blog::FONT.each do |x| %>
+                <option style="font-family: <%= x%>" value= <%= x %>><%= x%></option>
+              <%end%>
+            </select>
+          </li> 
+          <li>Font-size
+          <select id = "size">
+          <% (10..1000).each do |x| %>
+                <option style="font-size: <%= x%>" value= <%= x %>><%= x%></option>
+              <%end%>
+              </select>
+          </li>
+          <li>
+          <input type="submit" value="Submit" id = "apply" onclick="select_color(<%= blog.id%>)" >
+          </li>
+        </ul>
+        <article>
+          <div class="container">
+            <div class="row">
+              <h5 style="color: <%= blog.b_color%>; font-family: <%= blog.b_font %>; font-size:  <%=blog.b_font_size %>">
+              <%= blog.body %>
+            </div>
+          </div>
+        </article>
+      </div> 
+      <p><span>
+      <td><%= link_to 'Change Style', edit_blog_path(blog), {:remote => true, 'data-controls-modal' =>  "modal-window", 'data-backdrop' => true, 'data-keyboard' => true, 'data-toggle' =>  "modal" } %></td>
+      <td><%= link_to 'Edit Title', edit_blog_path(blog, :task => "Edit"), {:remote => true, 'data-controls-modal' =>  "modal-window", 'data-backdrop' => true, 'data-keyboard' => true, 'data-toggle' =>  "modal" } %></td>
+      </span></p> 
+    <%end%>
+	<% end %>
+
+<% else %>
+	<h1> SignIn Required</h1>
+<% end %>
+	
+<script type="text/javascript">
+function changeElement(id) {
+    var el = document.getElementById("myId");
+    el.style.color =  $('#color').val();
+    el.style.fontSize = "15px";
+    el.style.fontFamily =  $('#font').val();
+    el.style.backgroundColor = "#FFFFFF";
+  }
+
+  $(document).bind("contextmenu", function (event) {
+    
+    // Avoid the real one
+    event.preventDefault();
+    
+    // Show contextmenu
+    $(".custom-menu").finish().toggle(100).
+    
+    // In the right position (the mouse)
+    css({
+        top: event.pageY + "px",
+        left: event.pageX + "px"
+    });
+});
+
+
+// If the document is clicked somewhere
+$(document).bind("mousedown", function (e) {
+    
+    // If the clicked element is not the menu
+    if (!$(e.target).parents(".custom-menu").length > 0) {
+        
+        // Hide it
+        $(".custom-menu").hide(100);
+    }
+});
+
+
+// If the menu element is clicked
+// $(".custom-menu li").click(function(){
+    
+//     // This is the triggered action name
+//     switch($(this).attr("data-action")) {
+        
+//         // A case for each action. Your actions here
+//         case "first": alert("first"); break;
+//         case "second": alert("second"); break;
+//         case "third": alert("third"); break;
+//     }
+  
+//     // Hide it AFTER the action was triggered
+//     $(".custom-menu").hide(100);
+//   });
+
+//     $("#myId").mousedown(function(ev){
+//       if(ev.which == 3)
+//       {
+//             alert("Right mouse button clicked on element with id myId");
+//       }
+// });
+
+  function select_color(id){
+    var color = $('#color').val();
+    var bg = $('#bg').val();
+    var font = $('#font').val();
+    var size =  $('#size').val();
+    var style = 'color:' + color + ';' + 'font-family:' + font + ';' + 'font-size:' + size + 'px;' + 'background-color:' + bg
+    var data = { 'color': style, 'id' : id }
+    alert(color); 
+    $.ajax({
+      url : '/blogs/' + id + '/ajax_update',
+      data : data,
+       type : 'GET',
+      contentType : 'application/js',
+      dataType : 'JSON'
+    });
+  }
+  </script>
+
+<style type="text/css">
+  .custom-menu {
+    display: none;
+    z-index: 1000;
+    position: absolute;
+    overflow: hidden;
+    border: 1px solid #CCC;
+    white-space: nowrap;
+    font-family: sans-serif;
+    background: #FFF;
+    color: #333;
+    border-radius: 5px;
+    padding: 0;
+}
+
+/* Each of the items in the list */
+.custom-menu li {
+    padding: 8px 12px;
+    cursor: pointer;
+    list-style-type: none;
+    transition: all .3s ease;
+}
+
+.custom-menu li:hover {
+    background-color: #DEF;
+}
+</style>
+
+  document.getElementByClass(post-heading);
+
+
+
+
+  <article>
+          <div class="container">
+            <div class="row">
+              <h5 style="color: <%= @blog.b_color%>; font-family: <%= @blog.b_font %>; font-size:  <%=@blog.b_font_size %>">
+              <%= @blog.body %>
+            </div>
+          </div>
+        </article>
+      </div> 
+      <p><span>
+      <td><%= link_to 'Change Style', edit_blog_path(@blog), {:remote => true, 'data-controls-modal' =>  "modal-window", 'data-backdrop' => true, 'data-keyboard' => true, 'data-toggle' =>  "modal" } %></td>
+      <td><%= link_to 'Edit Title', edit_blog_path(@blog, :task => "Edit"), {:remote => true, 'data-controls-modal' =>  "modal-window", 'data-backdrop' => true, 'data-keyboard' => true, 'data-toggle' =>  "modal" } %></td>
+      </span></p> 
