@@ -7,8 +7,8 @@
             <div class="container text-center">
                 <div class="row">
                     <div class="col-lg-8">
-                        <div class="post-heading">
-                         <h1 style= <%= @blog.style  unless @blog.blank? %> id = "body">
+                        <div class="post-heading"  data-toggle="tooltip" title="Right click to Edit">
+                         <h1 style= <%= @blog.style  unless @blog.blank? %> id = "body" >
                               <%= @blog.title rescue "Title" %>
                             </h1> 
                         </div>
