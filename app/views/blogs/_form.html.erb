@@ -1,0 +1,30 @@
+<div class = "model" tabindex="-1" role="dialog">
+  <div class="modal-dialog"> 
+    <div class="modal-content" style="width: 100%">
+      <!-- <div class="modal-header">
+        <h4 class="modal-title"> Styling: </h4>
+      </div> -->
+      <div class="modal-body">
+        <%= form_for(@blog) do |f| %>
+          <% if @blog.errors.any? %>
+            <div id="error_explanation">
+              <h2><%= pluralize(@blog.errors.count, "error") %> prohibited this blog from being saved:</h2>
+              <ul>
+                <% @blog.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+          <div class="field">
+            <%= f.label :title %><br>
+            <%= f.text_field :title %>
+          </div>
+          <div class="actions">
+            <%= f.submit 'Create' %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
